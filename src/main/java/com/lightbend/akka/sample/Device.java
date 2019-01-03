@@ -2,6 +2,9 @@ package com.lightbend.akka.sample;
 
 import java.util.Optional;
 
+import com.lightbend.akka.sample.DeviceManager.DeviceRegistered;
+import com.lightbend.akka.sample.DeviceManager.RequestTrackDevice;
+
 import akka.actor.AbstractActor;
 import akka.actor.Props;
 import akka.event.Logging;
@@ -13,6 +16,7 @@ class Device extends AbstractActor {
 	final String groupId;
 	final String deviceId;
 	
+	//DeviceActor is always created with groupId and deviceId
 	public Device(String groupId, String deviceId) {
 		this.groupId = groupId;
 		this.deviceId = deviceId;
@@ -73,6 +77,15 @@ class Device extends AbstractActor {
 	@Override
 	public Receive createReceive() {
 		return receiveBuilder()
+				.match(RequestTrackDevice.class, r -> {
+					if (this.groupId.equals(r.groupId) && this.deviceId.equals(r.deviceId)) {
+						getSender().tell(new DeviceRegistered(r.requestId), getSelf());
+					} else {
+						log.warning(
+								"Ignoring TrackDevice request for {}-{}.This actor is responsible for {}-{}.",
+								r.groupId, r.deviceId, this.groupId, this.deviceId);
+					}
+				})
 				.match(RecordTemperature.class, r -> {
 					log.info("Recorded temperature reading {} with {}", r.value, r.requestId);
 					lastTemperatureReading = Optional.of(r.value);

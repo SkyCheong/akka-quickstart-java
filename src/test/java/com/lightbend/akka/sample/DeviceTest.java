@@ -26,6 +26,29 @@ public class DeviceTest {
         TestKit.shutdownActorSystem(system);
         system = null;
     }
+    
+    @Test
+    public void testReplyToRegistrationRequests() {
+    	TestKit probe = new TestKit(system);
+    	ActorRef deviceActor = system.actorOf(Device.props("group", "device"));
+    	
+    	deviceActor.tell(new DeviceManager.RequestTrackDevice(1L, "group", "device"), probe.getRef());
+    	probe.expectMsgClass(DeviceManager.DeviceRegistered.class);
+    	assertEquals(deviceActor, probe.getLastSender());
+    }
+    
+    @Test
+    public void testIgnoreWrongRegistrationRequests() {
+    	TestKit probe = new TestKit(system);
+    	ActorRef deviceActor = system.actorOf(Device.props("group", "device"));
+    	
+    	deviceActor.tell(new DeviceManager.RequestTrackDevice(1L, "wrongGroup", "device"), probe.getRef());
+    	probe.expectNoMessage();
+    	
+    	deviceActor.tell(new DeviceManager.RequestTrackDevice(1L, "group", "wrongDevice"), probe.getRef());
+    	probe.expectNoMessage();
+    	
+    }
 	
 	@Test
 	public void testReplyWithEmptyReadingIfNoTemperatureIsKnown() {
