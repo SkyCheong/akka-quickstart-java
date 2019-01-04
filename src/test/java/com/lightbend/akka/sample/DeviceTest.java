@@ -32,7 +32,7 @@ public class DeviceTest {
     	TestKit probe = new TestKit(system);
     	ActorRef deviceActor = system.actorOf(Device.props("group", "device"));
     	
-    	deviceActor.tell(new DeviceManager.RequestTrackDevice(1L, "group", "device"), probe.getRef());
+    	deviceActor.tell(new DeviceManager.RequestTrackDevice("group", "device"), probe.getRef());
     	probe.expectMsgClass(DeviceManager.DeviceRegistered.class);
     	assertEquals(deviceActor, probe.getLastSender());
     }
@@ -42,10 +42,10 @@ public class DeviceTest {
     	TestKit probe = new TestKit(system);
     	ActorRef deviceActor = system.actorOf(Device.props("group", "device"));
     	
-    	deviceActor.tell(new DeviceManager.RequestTrackDevice(1L, "wrongGroup", "device"), probe.getRef());
+    	deviceActor.tell(new DeviceManager.RequestTrackDevice("wrongGroup", "device"), probe.getRef());
     	probe.expectNoMessage();
     	
-    	deviceActor.tell(new DeviceManager.RequestTrackDevice(1L, "group", "wrongDevice"), probe.getRef());
+    	deviceActor.tell(new DeviceManager.RequestTrackDevice("group", "wrongDevice"), probe.getRef());
     	probe.expectNoMessage();
     	
     }

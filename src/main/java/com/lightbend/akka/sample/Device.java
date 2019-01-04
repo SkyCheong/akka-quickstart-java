@@ -79,7 +79,7 @@ class Device extends AbstractActor {
 		return receiveBuilder()
 				.match(RequestTrackDevice.class, r -> {
 					if (this.groupId.equals(r.groupId) && this.deviceId.equals(r.deviceId)) {
-						getSender().tell(new DeviceRegistered(r.requestId), getSelf());
+						getSender().tell(new DeviceRegistered(), getSelf());
 					} else {
 						log.warning(
 								"Ignoring TrackDevice request for {}-{}.This actor is responsible for {}-{}.",
